@@ -4,7 +4,7 @@
   "description": "Falling sand simulation project built with PixiJS typescript and parcel",
   "scripts": {
     "start": "parcel src/index.html --dist-dir dist",
-    "build": "NODE_ENV=production parcel build src/index.html --dist-dir docs --public-url ./"
+    "build": "NODE_ENV=production parcel build src/index.html --dist-dir build --public-url ./"
   },
   "keywords": [],
   "author": "",
