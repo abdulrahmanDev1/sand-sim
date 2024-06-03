@@ -1,15 +1,22 @@
 import * as PIXI from 'pixi.js';
 
-const pixi = new PIXI.Application({ width: 800, height: 900 });
+const pixi = new PIXI.Application({
+  width: 800,
+  height: 900,
+  backgroundColor: 0x212121,
+});
 document.body.appendChild(pixi.view);
 
-export class Square {
+export enum ParticleType {
+  Sand,
+}
+
+abstract class Particle {
   public square: PIXI.Graphics;
   public filled: boolean;
 
-  constructor(x: number, y: number, w: number) {
+  constructor(public x: number, public y: number, public w: number) {
     this.square = new PIXI.Graphics();
-    this.square.beginFill(0x282828);
     this.square.drawRect(0, 0, w, w);
     this.square.x = x;
     this.square.y = y;
@@ -22,18 +29,23 @@ export class Square {
     stage.addChild(this.square);
   }
 
+  abstract fill(): void;
+
+  abstract clear(): void;
+}
+
+class Sand extends Particle {
   fill() {
     this.square.clear();
     this.square.beginFill(0xe2c044);
-    this.square.drawRect(0, 0, w, w);
+    this.square.drawRect(0, 0, this.w, this.w);
     this.square.endFill();
     this.filled = true;
   }
 
   clear() {
     this.square.clear();
-    this.square.beginFill(0x282828);
-    this.square.drawRect(0, 0, w, w);
+    this.square.drawRect(0, 0, this.w, this.w);
     this.square.endFill();
     this.filled = false;
   }
@@ -42,20 +54,27 @@ export class Square {
 let w: number = 4;
 let cols: number = Math.floor(pixi.renderer.width / w);
 let rows: number = Math.floor(pixi.renderer.height / w);
-let grid: Square[][] = Array.from({ length: cols }, () =>
+let grid: Particle[][] = Array.from({ length: cols }, () =>
   Array(rows).fill(null)
 );
 
+let particleType: ParticleType = ParticleType.Sand;
+
 for (let i = 0; i < cols; i++) {
   for (let j = 0; j < rows; j++) {
-    grid[i][j] = new Square(i * w, j * w, w);
+    switch (particleType) {
+      case ParticleType.Sand:
+        grid[i][j] = new Sand(i * w, j * w, w);
+        break;
+      //  other particle types here
+    }
     grid[i][j].addToStage(pixi.stage);
   }
 }
 
 let isDragging = false;
 
-let drawRadius = 4; // You can adjust this value to modify the drawing radius
+let drawRadius = 4; //adjust this value to modify the drawing radius
 
 // Create a new Graphics object for the circle
 let circle = new PIXI.Graphics();
@@ -97,7 +116,7 @@ pixi.view.addEventListener('mousemove', (event) => {
 });
 pixi.view.addEventListener('mouseup', () => (isDragging = false));
 
-let gravity = 1; // You can adjust this value to modify the gravity
+let gravity = 10; // adjust this value to modify the gravity
 
 function fall() {
   for (let i = 0; i < cols; i++) {
@@ -139,8 +158,10 @@ function glide() {
   }
 }
 
-pixi.ticker.add(fall);
-pixi.ticker.add(() => {
+function gameLoop() {
   fall();
   glide();
-});
+  requestAnimationFrame(gameLoop);
+}
+
+requestAnimationFrame(gameLoop);

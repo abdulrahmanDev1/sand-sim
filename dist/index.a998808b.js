@@ -586,17 +586,24 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 },{}],"edeGs":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Square", ()=>Square);
+parcelHelpers.export(exports, "ParticleType", ()=>ParticleType);
 var _pixiJs = require("pixi.js");
 const pixi = new _pixiJs.Application({
     width: 800,
-    height: 900
+    height: 900,
+    backgroundColor: 0x212121
 });
 document.body.appendChild(pixi.view);
-class Square {
+var ParticleType;
+(function(ParticleType) {
+    ParticleType[ParticleType["Sand"] = 0] = "Sand";
+})(ParticleType || (ParticleType = {}));
+class Particle {
     constructor(x, y, w){
+        this.x = x;
+        this.y = y;
+        this.w = w;
         this.square = new _pixiJs.Graphics();
-        this.square.beginFill(0x282828);
         this.square.drawRect(0, 0, w, w);
         this.square.x = x;
         this.square.y = y;
@@ -607,17 +614,18 @@ class Square {
     addToStage(stage) {
         stage.addChild(this.square);
     }
+}
+class Sand extends Particle {
     fill() {
         this.square.clear();
         this.square.beginFill(0xe2c044);
-        this.square.drawRect(0, 0, w, w);
+        this.square.drawRect(0, 0, this.w, this.w);
         this.square.endFill();
         this.filled = true;
     }
     clear() {
         this.square.clear();
-        this.square.beginFill(0x282828);
-        this.square.drawRect(0, 0, w, w);
+        this.square.drawRect(0, 0, this.w, this.w);
         this.square.endFill();
         this.filled = false;
     }
@@ -628,12 +636,17 @@ let rows = Math.floor(pixi.renderer.height / w);
 let grid = Array.from({
     length: cols
 }, ()=>Array(rows).fill(null));
+let particleType = 0;
 for(let i = 0; i < cols; i++)for(let j = 0; j < rows; j++){
-    grid[i][j] = new Square(i * w, j * w, w);
+    switch(particleType){
+        case 0:
+            grid[i][j] = new Sand(i * w, j * w, w);
+            break;
+    }
     grid[i][j].addToStage(pixi.stage);
 }
 let isDragging = false;
-let drawRadius = 4; // You can adjust this value to modify the drawing radius
+let drawRadius = 4; //adjust this value to modify the drawing radius
 // Create a new Graphics object for the circle
 let circle = new _pixiJs.Graphics();
 pixi.stage.addChild(circle);
@@ -666,7 +679,7 @@ pixi.view.addEventListener("mousemove", (event)=>{
     drawCircle(event);
 });
 pixi.view.addEventListener("mouseup", ()=>isDragging = false);
-let gravity = 1; // You can adjust this value to modify the gravity
+let gravity = 10; // adjust this value to modify the gravity
 function fall() {
     for(let i = 0; i < cols; i++)for(let j = rows - 2; j >= 0; j--){
         const square = grid[i][j];
@@ -697,11 +710,12 @@ function glide() {
         }
     }
 }
-pixi.ticker.add(fall);
-pixi.ticker.add(()=>{
+function gameLoop() {
     fall();
     glide();
-});
+    requestAnimationFrame(gameLoop);
+}
+requestAnimationFrame(gameLoop);
 
 },{"pixi.js":"1pSin","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1pSin":[function(require,module,exports) {
 /*!
