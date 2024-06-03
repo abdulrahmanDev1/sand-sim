@@ -211,7 +211,7 @@ function glide() {
               (!belowNextSquare || !belowNextSquare.filled)
             ) {
               square.clear();
-              nextSquare.setColor(square.color); // Pass the color to the next square
+              nextSquare.setColor(square.color); 
               nextSquare.fill();
             }
           }
