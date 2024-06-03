@@ -1,0 +1,22 @@
+{
+  "name": "sand-sim",
+  "version": "1.0.0",
+  "description": "Falling sand simulation project built with PixiJS typescript and parcel",
+  "scripts": {
+    "start": "parcel src/index.html --dist-dir dist",
+    "build": "parcel build src/index.html --dist-dir dist --public-url ./"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "pixi.js": "^6.5.10",
+    "svgo": "^3.0.2"
+  },
+  "devDependencies": {
+    "parcel": "^2.12.0",
+    "querystring-es3": "^0.2.1",
+    "typescript": "^4.9.5",
+    "url": "^0.11.3"
+  }
+}
