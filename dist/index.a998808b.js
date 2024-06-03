@@ -589,8 +589,8 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "ParticleType", ()=>ParticleType);
 var _pixiJs = require("pixi.js");
 const pixi = new _pixiJs.Application({
-    width: 800,
-    height: 900,
+    width: window.innerWidth,
+    height: window.innerHeight,
     backgroundColor: 0x212121
 });
 document.body.appendChild(pixi.view);
@@ -615,10 +615,20 @@ class Particle {
         stage.addChild(this.square);
     }
 }
+const colorPicker = document.getElementById("color-picker");
+const resetBtn = document.getElementById("reset-color");
+let defaultColor = 0xe2c044;
+let color = defaultColor;
+colorPicker.addEventListener("input", ()=>{
+    color = parseInt(colorPicker.value.slice(1), 16);
+});
+resetBtn.addEventListener("click", ()=>{
+    color = defaultColor;
+});
 class Sand extends Particle {
     fill() {
         this.square.clear();
-        this.square.beginFill(0xe2c044);
+        this.square.beginFill(color);
         this.square.drawRect(0, 0, this.w, this.w);
         this.square.endFill();
         this.filled = true;
@@ -646,7 +656,11 @@ for(let i = 0; i < cols; i++)for(let j = 0; j < rows; j++){
     grid[i][j].addToStage(pixi.stage);
 }
 let isDragging = false;
-let drawRadius = 4; //adjust this value to modify the drawing radius
+const brushSize = document.getElementById("brush-size");
+let drawRadius = 4;
+brushSize.addEventListener("input", ()=>{
+    drawRadius = brushSize.valueAsNumber;
+});
 // Create a new Graphics object for the circle
 let circle = new _pixiJs.Graphics();
 pixi.stage.addChild(circle);
@@ -656,7 +670,13 @@ function draw(e) {
     const y = e.clientY - rect.top;
     const mouseX = Math.floor(x / w);
     const mouseY = Math.floor(y / w);
-    for(let i = 0; i < cols; i++)for(let j = 0; j < rows; j++){
+    // Calculate the bounds of the circle
+    const minX = Math.max(0, mouseX - drawRadius);
+    const maxX = Math.min(cols, mouseX + drawRadius);
+    const minY = Math.max(0, mouseY - drawRadius);
+    const maxY = Math.min(rows, mouseY + drawRadius);
+    // Only iterate over the cells within the bounds
+    for(let i = minX; i < maxX; i++)for(let j = minY; j < maxY; j++){
         const dx = i - mouseX;
         const dy = j - mouseY;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -679,7 +699,11 @@ pixi.view.addEventListener("mousemove", (event)=>{
     drawCircle(event);
 });
 pixi.view.addEventListener("mouseup", ()=>isDragging = false);
-let gravity = 10; // adjust this value to modify the gravity
+const grevityRang = document.getElementById("gravity");
+let gravity = 1;
+grevityRang.addEventListener("input", ()=>{
+    gravity = grevityRang.valueAsNumber;
+});
 function fall() {
     for(let i = 0; i < cols; i++)for(let j = rows - 2; j >= 0; j--){
         const square = grid[i][j];

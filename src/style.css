@@ -7,7 +7,42 @@ body {
   overflow: hidden;
 }
 
-canvas {
-  /* uncomment this to scale to 100% of the window */
-  /* width:100vw; */
+.input-group {
+  display: flex;
+  color: white;
+  font-family: jetbrains mono;
+  gap: 5px;
+
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.inputs {
+  position: absolute;
+  width: 100%;
+  top: 2%;
+  display: flex;
+  justify-content: space-between;
+}
+
+input[type='color'] {
+  opacity: 0;
+  display: block;
+  width: 25px;
+  height: 25px;
+  border: none;
+}
+#color-picker-wrapper {
+  float: left;
+  border-radius: 50%;
+}
+
+#reset-color {
+  border: none;
+  background: transparent;
+  color: white;
+  border-radius: 50%;
+  height: 25px;
+  cursor: pointer;
 }

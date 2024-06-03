@@ -6,7 +6,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./style.css" />
     <script defer type="module" src="./game.ts"></script>
-    <title>PixiJS Start Project</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <title>Sand Simulation</title>
   </head>
-  <body></body>
+  <body>
+    <div class="inputs">
+      <div class="input-group">
+        <label for="gravity">Gravity</label>
+        <input
+          type="range"
+          name="gravity"
+          id="gravity"
+          min="0"
+          max="1"
+          step="0.01"
+          value="1"
+        />
+      </div>
+      <div class="input-group">
+        <label for="brush-size">Brush Size</label>
+        <input
+          type="range"
+          name="brush-size"
+          id="brush-size"
+          min="1"
+          max="10"
+          step="1"
+          value="4"
+        />
+      </div>
+      <div class="input-group">
+        <label for="color">Color</label>
+        <div id="color-picker-wrapper">
+          <input type="color" value="#e2c044" id="color-picker" />
+        </div>
+        <button id="reset-color"><i class="fas fa-undo"></i></button>
+      </div>
+    </div>
+    <script>
+      var color_picker = document.getElementById('color-picker');
+      var color_picker_wrapper = document.getElementById(
+        'color-picker-wrapper'
+      );
+      color_picker.onchange = function () {
+        color_picker_wrapper.style.backgroundColor = color_picker.value;
+      };
+      color_picker_wrapper.style.backgroundColor = color_picker.value;
+      document.getElementById('reset-color').onclick = function () {
+        color_picker.value = '#e2c044';
+        color_picker_wrapper.style.backgroundColor = color_picker.value;
+      };
+    </script>
+  </body>
 </html>
