@@ -9,7 +9,8 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
-    "lib": ["es6", "dom"]
+    "lib": ["es6", "dom"],
+    "types": ["pixi.js"]
   },
   "include": ["./src/**/*", "globals.d.ts"]
 }

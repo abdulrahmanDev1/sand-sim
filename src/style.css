@@ -23,7 +23,6 @@ body {
   width: 100%;
   top: 2%;
   display: flex;
-  justify-content: space-between;
 }
 
 input[type='color'] {
@@ -45,4 +44,18 @@ input[type='color'] {
   border-radius: 50%;
   height: 25px;
   cursor: pointer;
+}
+
+#clear-grid {
+  border: 1px dashed red;
+  margin-left: 20px;
+  background: transparent;
+  color: white;
+  border-radius: 20px;
+  width: max-content;
+  height: 25px;
+}
+
+#clear-grid:hover {
+  background: red;
 }

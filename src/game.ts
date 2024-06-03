@@ -155,7 +155,8 @@ function drawCircle(e: MouseEvent | TouchEvent) {
   // Clear the previous circle
   circle.clear();
   // Draw a new circle at the mouse position
-  circle.lineStyle(1, 0xffffff);
+  // circle.lineStyle(1, 0xffffff);
+  circle.beginFill(0xffffff, 0.2);
   circle.drawCircle(x, y, drawRadius * w);
 }
 
@@ -211,7 +212,7 @@ function glide() {
               (!belowNextSquare || !belowNextSquare.filled)
             ) {
               square.clear();
-              nextSquare.setColor(square.color); 
+              nextSquare.setColor(square.color);
               nextSquare.fill();
             }
           }
@@ -220,6 +221,18 @@ function glide() {
     }
   }
 }
+
+const clearBtn = document.getElementById('clear-grid') as HTMLButtonElement;
+
+function clearGrid() {
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      grid[i][j].clear();
+    }
+  }
+}
+
+clearBtn.addEventListener('click', clearGrid);
 
 function gameLoop() {
   fall();
