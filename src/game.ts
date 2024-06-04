@@ -1,9 +1,16 @@
 import * as PIXI from 'pixi.js';
+import { Particle, Sand } from './particles';
+import { fall, glide } from './physics';
+
+const BACKGROUND_COLOR = 0x212121;
+const DEFAULT_COLOR = 0xe2c044;
+const CELL_SIZE = 4;
+let DRAW_RADIUS = 4;
 
 const pixi = new PIXI.Application({
   width: window.innerWidth,
   height: window.innerHeight,
-  backgroundColor: 0x212121,
+  backgroundColor: BACKGROUND_COLOR,
 });
 document.body.appendChild(pixi.view);
 
@@ -11,103 +18,45 @@ export enum ParticleType {
   Sand,
 }
 
-abstract class Particle {
-  public square: PIXI.Graphics;
-  public filled: boolean;
-  public color: number;
-
-  constructor(
-    public x: number,
-    public y: number,
-    public w: number,
-    color: number
-  ) {
-    this.color = color;
-    this.square = new PIXI.Graphics();
-    this.square.drawRect(0, 0, w, w);
-    this.square.x = x;
-    this.square.y = y;
-    this.square.interactive = true;
-    this.square.buttonMode = true;
-    this.filled = false;
-    this.square.on('pointerdown', () => {
-      this.setColor(currentColor);
-      this.fill();
-    });
-  }
-
-  addToStage(stage: PIXI.Container) {
-    stage.addChild(this.square);
-  }
-
-  setColor(color: number) {
-    this.color = color;
-  }
-
-  abstract fill(): void;
-
-  abstract clear(): void;
-}
-
 const colorPicker = document.getElementById('color-picker') as HTMLInputElement;
 const resetBtn = document.getElementById('reset-color') as HTMLButtonElement;
-let defaultColor = 0xe2c044;
-let currentColor: number = defaultColor;
+const brushSize = document.getElementById('brush-size') as HTMLInputElement;
+const clearBtn = document.getElementById('clear-grid') as HTMLButtonElement;
+
+let cols: number = Math.floor(pixi.renderer.width / CELL_SIZE);
+let rows: number = Math.floor(pixi.renderer.height / CELL_SIZE);
+let grid: Particle[][] = Array.from({ length: cols }, () =>
+  Array(rows).fill(null)
+);
+
+let currentColor: number = DEFAULT_COLOR;
+let particleType: ParticleType = ParticleType.Sand;
+
+let isDragging = false;
+pixi.view.addEventListener('mousedown', () => (isDragging = true));
+pixi.view.addEventListener('mousemove', (event) => {
+  if (isDragging) draw(event);
+  drawCircle(event);
+});
+pixi.view.addEventListener('mouseup', () => (isDragging = false));
+
+pixi.view.addEventListener('touchstart', () => (isDragging = true));
+pixi.view.addEventListener('touchmove', (event) => {
+  if (isDragging) draw(event);
+  drawCircle(event);
+});
+pixi.view.addEventListener('touchend', () => (isDragging = false));
 
 colorPicker.addEventListener('input', () => {
   currentColor = parseInt(colorPicker.value.slice(1), 16);
 });
 resetBtn.addEventListener('click', () => {
-  currentColor = defaultColor;
+  currentColor = DEFAULT_COLOR;
 });
-
-class Sand extends Particle {
-  fill() {
-    this.square.clear();
-    this.square.beginFill(this.color);
-    this.square.drawRect(0, 0, this.w, this.w);
-    this.square.endFill();
-    this.filled = true;
-  }
-
-  clear() {
-    this.square.clear();
-    this.square.drawRect(0, 0, this.w, this.w);
-    this.square.endFill();
-    this.filled = false;
-  }
-}
-
-let w: number = 4;
-let cols: number = Math.floor(pixi.renderer.width / w);
-let rows: number = Math.floor(pixi.renderer.height / w);
-let grid: Particle[][] = Array.from({ length: cols }, () =>
-  Array(rows).fill(null)
-);
-
-let particleType: ParticleType = ParticleType.Sand;
-
-for (let i = 0; i < cols; i++) {
-  for (let j = 0; j < rows; j++) {
-    let color = defaultColor;
-    switch (particleType) {
-      case ParticleType.Sand:
-        grid[i][j] = new Sand(i * w, j * w, w, color);
-        break;
-      // Other particle types here
-    }
-    grid[i][j].addToStage(pixi.stage);
-  }
-}
-
-let isDragging = false;
-
-const brushSize = document.getElementById('brush-size') as HTMLInputElement;
-let drawRadius: number = 4;
-
 brushSize.addEventListener('input', () => {
-  drawRadius = brushSize.valueAsNumber;
+  DRAW_RADIUS = brushSize.valueAsNumber;
 });
+clearBtn.addEventListener('click', clearGrid);
 
 // Create a new Graphics object for the circle
 let circle = new PIXI.Graphics();
@@ -121,14 +70,14 @@ function draw(e: MouseEvent | TouchEvent) {
     (e as MouseEvent).clientY ?? (e as TouchEvent).touches[0].clientY;
   const x = clientX - rect.left;
   const y = clientY - rect.top;
-  const mouseX = Math.floor(x / w);
-  const mouseY = Math.floor(y / w);
+  const mouseX = Math.floor(x / CELL_SIZE);
+  const mouseY = Math.floor(y / CELL_SIZE);
 
   // Calculate the bounds of the circle
-  const minX = Math.max(0, mouseX - drawRadius);
-  const maxX = Math.min(cols, mouseX + drawRadius);
-  const minY = Math.max(0, mouseY - drawRadius);
-  const maxY = Math.min(rows, mouseY + drawRadius);
+  const minX = Math.max(0, mouseX - DRAW_RADIUS);
+  const maxX = Math.min(cols, mouseX + DRAW_RADIUS);
+  const minY = Math.max(0, mouseY - DRAW_RADIUS);
+  const maxY = Math.min(rows, mouseY + DRAW_RADIUS);
 
   // Only iterate over the cells within the bounds
   for (let i = minX; i < maxX; i++) {
@@ -136,7 +85,7 @@ function draw(e: MouseEvent | TouchEvent) {
       const dx = i - mouseX;
       const dy = j - mouseY;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance <= drawRadius) {
+      if (distance <= DRAW_RADIUS) {
         grid[i][j].setColor(currentColor);
         grid[i][j].fill();
       }
@@ -155,74 +104,9 @@ function drawCircle(e: MouseEvent | TouchEvent) {
   // Clear the previous circle
   circle.clear();
   // Draw a new circle at the mouse position
-  // circle.lineStyle(1, 0xffffff);
   circle.beginFill(0xffffff, 0.2);
-  circle.drawCircle(x, y, drawRadius * w);
+  circle.drawCircle(x, y, DRAW_RADIUS * CELL_SIZE);
 }
-
-pixi.view.addEventListener('mousedown', () => (isDragging = true));
-pixi.view.addEventListener('mousemove', (event) => {
-  if (isDragging) draw(event);
-  drawCircle(event);
-});
-pixi.view.addEventListener('mouseup', () => (isDragging = false));
-
-pixi.view.addEventListener('touchstart', () => (isDragging = true));
-pixi.view.addEventListener('touchmove', (event) => {
-  if (isDragging) draw(event);
-  drawCircle(event);
-});
-pixi.view.addEventListener('touchend', () => (isDragging = false));
-
-const gravityRange = document.getElementById('gravity') as HTMLInputElement;
-let gravity = 0.9;
-gravityRange.addEventListener('input', () => {
-  gravity = gravityRange.valueAsNumber;
-});
-
-function fall() {
-  for (let i = 0; i < cols; i++) {
-    for (let j = rows - 2; j >= 0; j--) {
-      const square = grid[i][j];
-      const belowSquare = grid[i][j + 1];
-      if (square.filled && !belowSquare.filled && Math.random() < gravity) {
-        square.clear();
-        belowSquare.setColor(square.color); // Pass the color to the below square
-        belowSquare.fill();
-      }
-    }
-  }
-}
-
-function glide() {
-  for (let i = 0; i < cols; i++) {
-    for (let j = rows - 1; j >= 0; j--) {
-      const square = grid[i][j];
-      if (square.filled) {
-        const belowSquare = j + 1 < rows ? grid[i][j + 1] : null;
-        if (belowSquare && belowSquare.filled) {
-          const randomDirection = Math.random() < 0.5 ? -1 : 1;
-          const nextSquareIndex = i + randomDirection;
-          if (nextSquareIndex >= 0 && nextSquareIndex < cols) {
-            const nextSquare = grid[nextSquareIndex][j];
-            const belowNextSquare =
-              j + 1 < rows ? grid[nextSquareIndex][j + 1] : null;
-            if (
-              !nextSquare.filled &&
-              (!belowNextSquare || !belowNextSquare.filled)
-            ) {
-              square.clear();
-              nextSquare.setColor(square.color);
-              nextSquare.fill();
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-const clearBtn = document.getElementById('clear-grid') as HTMLButtonElement;
 
 function clearGrid() {
   for (let i = 0; i < cols; i++) {
@@ -232,12 +116,41 @@ function clearGrid() {
   }
 }
 
-clearBtn.addEventListener('click', clearGrid);
-
-function gameLoop() {
-  fall();
-  glide();
-  requestAnimationFrame(gameLoop);
+// Create a grid of particles
+for (let i = 0; i < cols; i++) {
+  for (let j = 0; j < rows; j++) {
+    let color = DEFAULT_COLOR;
+    switch (particleType) {
+      case ParticleType.Sand:
+        grid[i][j] = new Sand(
+          i * DRAW_RADIUS,
+          j * DRAW_RADIUS,
+          DRAW_RADIUS,
+          color
+        );
+        break;
+      // Other particle types here
+    }
+    grid[i][j].addToStage(pixi.stage);
+  }
 }
 
-requestAnimationFrame(gameLoop);
+function startGameLoop() {
+  let lastTime = performance.now();
+  function loop() {
+    const currentTime = performance.now();
+    const deltaTime = currentTime - lastTime;
+    if (deltaTime >= 16) {
+      // Limit the frame rate to approximately 60 frames per second
+      fall();
+      glide();
+      lastTime = currentTime;
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+}
+
+startGameLoop();
+
+export { cols, rows, grid, currentColor };
