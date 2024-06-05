@@ -1,5 +1,5 @@
 # Sand Simulation Project
-
+ *Inspired by TheCodingTrain and his coding challenge  [#180] (https://www.youtube.com/watch?v=L4u7Zy_b868)* 
 #### Try it out [here](https://sand-sim.d7om.dev)
 
 ![demo](./sand-sim-demo.png)
