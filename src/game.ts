@@ -4,7 +4,7 @@ import { fall, glide } from './physics';
 
 const BACKGROUND_COLOR = 0x212121;
 const DEFAULT_COLOR = 0xe2c044;
-let APP_WIDTH = window.innerWidth - 200;
+let APP_WIDTH = window.innerWidth * 0.8;
 let APP_HEIGHT = window.innerHeight - 200;
 
 const CELL_SIZE = 4;
