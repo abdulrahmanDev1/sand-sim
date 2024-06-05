@@ -1,7 +1,7 @@
 {
   "name": "sand-sim",
   "version": "1.0.0",
-  "description": "Falling sand simulation project built with PixiJS typescript and parcel",
+  "description": "Falling sand simulation project built with PixiJS typescript and vite",
   "source": "src/index.html",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
