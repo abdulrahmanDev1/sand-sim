@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js';
-import { currentColor } from './game';
 
 export abstract class Particle {
   public square: PIXI.Graphics;
@@ -21,7 +20,7 @@ export abstract class Particle {
     this.square.buttonMode = true;
     this.filled = false;
     this.square.on('pointerdown', () => {
-      this.setColor(currentColor);
+      this.setColor(color);
       this.fill();
     });
   }
