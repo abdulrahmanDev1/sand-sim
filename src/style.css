@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 body {
   background-color: #282828;
   margin: 0;
@@ -10,7 +11,7 @@ body {
 .input-group {
   display: flex;
   color: white;
-  font-family: jetbrains mono;
+  font-family: 'JetBrains Mono', monospace;
   gap: 5px;
 
   justify-content: center;
@@ -62,7 +63,7 @@ input[type='color'] {
 
 #game-canvas {
   position: absolute;
-  top: 60%;
+  top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
   border: 1px dashed rgba(255, 255, 255, 0.445);
