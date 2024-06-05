@@ -57,6 +57,29 @@ input[type='color'] {
   height: 25px;
 }
 
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+footer a {
+  color: white;
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+footer .fa-heart {
+  color: rgb(255, 0, 0);
+}
+
+footer a:hover {
+  color: #e2c044;
+}
+
 #clear-grid:hover {
   background: red;
 }

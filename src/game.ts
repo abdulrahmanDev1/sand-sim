@@ -4,7 +4,7 @@ import { fall, glide } from './physics';
 
 const BACKGROUND_COLOR = 0x212121;
 const DEFAULT_COLOR = 0xe2c044;
-let APP_WIDTH = window.innerWidth - 500;
+let APP_WIDTH = window.innerWidth - 200;
 let APP_HEIGHT = window.innerHeight - 200;
 
 const CELL_SIZE = 4;
@@ -116,19 +116,6 @@ function draw(e: MouseEvent | TouchEvent) {
     }
   }
 }
-
-// function drawCircle(e: MouseEvent | TouchEvent) {
-//   const clientX =
-//     (e as MouseEvent).clientX ?? (e as TouchEvent).touches[0].clientX;
-//   const clientY =
-//     (e as MouseEvent).clientY ?? (e as TouchEvent).touches[0].clientY;
-//   const x = clientX - rect.left;
-//   const y = clientY - rect.top;
-//   circle.clear();
-//   // circle.beginFill(0xffffff, 0.2);
-//   circle.lineStyle(1, 0xffffff, 0.2);
-//   circle.drawCircle(x, y, DRAW_RADIUS * CELL_SIZE);
-// }
 
 function clearGrid() {
   for (let i = 0; i < cols; i++) {
